@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpenseTracker Pro - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4e73df;
+            --secondary: #6f42c1;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+            --warning: #f6c23e;
+            --info: #36b9cc;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
+            --gray: #b7b9cc;
+        }
+        
+        body {
+            background-color: #f8f9fc;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: block;
+            min-height: 100vh;
+        }
+        
+        .app-header {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+        
+        .app-logo i {
+            font-size: 24px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a59c7;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d52a1a;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e6b301;
+        }
+        
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar h2 {
+            color: var(--dark);
+            margin: 20px 0 10px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            text-decoration: none;
+            color: var(--dark);
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .view-container {
+            display: none;
+        }
+        
+        .view-container.active {
+            display: block;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card.income {
+            border-left-color: var(--success);
+        }
+        
+        .stat-card.expense {
+            border-left-color: var(--danger);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .expense-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .expense-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+        
+        .expense-details {
+            flex: 1;
+        }
+        
+        .expense-amount {
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .expense-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .toast i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .toast.success i {
+            color: var(--success);
+        }
+        
+        .toast.error i {
+            color: var(--danger);
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        .placeholder-view {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .placeholder-view i {
+            font-size: 48px;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .placeholder-view h2 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .placeholder-view p {
+            color: var(--gray);
+        }
+        
+        .category-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        
+        .category-food { background: #ffeaa7; color: #d35400; }
+        .category-transport { background: #81ecec; color: #00b894; }
+        .category-shopping { background: #fab1a0; color: #d63031; }
+        .category-utilities { background: #74b9ff; color: #0984e3; }
+        .category-entertainment { background: #fd79a8; color: #e84393; }
+        .category-health { background: #a29bfe; color: #6c5ce7; }
+        .category-travel { background: #ffeaa7; color: #fdcb6e; }
+        .category-other { background: #dfe6e9; color: #636e72; }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <header class="app-header">
+            <div class="app-logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>ExpenseTracker Pro</h1>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="#" class="active" data-view="dashboard">Dashboard</a>
+                <a href="#" data-view="receipt">Receipt Scanner</a>
+                <a href="#" data-view="wallets">Shared Wallets</a>
+                <a href="#" data-view="analytics">Analytics</a>
+                <a href="#" data-view="notifications">Notifications</a>
+                <a href="#" data-view="salary">Salary</a>
+            </nav>
+            
+            <div class="user-actions">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div class="welcome-text">
+                        <div id="userName">welcome</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-danger" id="logoutBtn">Logout</button>
+            </div>
+        </header>   
+        
+        <div class="main-content">
+            <aside class="sidebar">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active" data-view="dashboard"><i class="fas fa-home"></i> Overview</a></li>
+                    <li><a href="#" data-view="expenses"><i class="fas fa-receipt"></i> Expenses</a></li>
+                    <li><a href="#" data-view="budgets"><i class="fas fa-chart-pie"></i> Budgets</a></li>
+                    <li><a href="#" data-view="reports"><i class="fas fa-file-alt"></i> Reports</a></li>
+                    <li><a href="#" data-view="settings"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+                
+                <h2><i class="fas fa-wallet"></i> Wallets</h2>
+                <ul class="sidebar-menu">
+                    <li><a href="#" data-view="wallets"><i class="fas fa-users"></i> Family Wallet</a></li>
+                    <li><a href="#" data-view="wallets"><i class="fas fa-briefcase"></i> Business</a></li>
+                    <li><a href="#" data-view="wallets"><i class="fas fa-suitcase"></i> Travel Fund</a></li>
+                </ul>
+            </aside>
+            
+            <main class="content-area">
+                <!-- Dashboard view -->
+                <div id="dashboard-view" class="view-container active">
+                    <div class="dashboard-header">
+                        <div class="welcome-text">
+                            <h2 id="welcomeText">ExpenseTracker</h2>
+                            <p>Here's an overview of your financial activity</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" id="addExpenseBtn">+ Add Expense</button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <h3>Total Balance</h3>
+                            <div class="amount" id="totalBalance">$4,250.75</div>
+                        </div>
+                        <div class="stat-card income">
+                            <h3>Monthly Income</h3>
+                            <div class="amount" id="monthlyIncome">$5,200.00</div>
+                        </div>
+                        <div class="stat-card expense">
+                            <h3>Monthly Expenses</h3>
+                            <div class="amount" id="monthlyExpenses">$950.25</div>
+                        </div>
+                    </div>
+
+                    <!-- Expense Form (initially hidden) -->
+                    <div class="expense-form" id="expenseForm" style="display: none;">
+                        <h3>Add New Expense</h3>
+                        <form id="createExpenseForm">
+                            <div class="form-group">
+                                <label for="expenseAmount">Amount</label>
+                                <input type="number" id="expenseAmount" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseCategory">Category</label>
+                                <select id="expenseCategory" required>
+                                    <option value="">Select a category</option>
+                                    <option value="food">Food & Dining</option>
+                                    <option value="transport">Transportation</option>
+                                    <option value="shopping">Shopping</option>
+                                    <option value="utilities">Utilities</option>
+                                    <option value="entertainment">Entertainment</option>
+                                    <option value="health">Health & Fitness</option>
+                                    <option value="travel">Travel</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseDescription">Description</label>
+                                <textarea id="expenseDescription" rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseDate">Date</label>
+                                <input type="date" id="expenseDate" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Add Expense</button>
+                                <button type="button" class="btn" id="cancelExpenseBtn">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Expense List -->
+                    <div class="expense-list">
+                        <h3>Recent Expenses</h3>
+                        <div id="expensesContainer">
+                            <!-- Expenses will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Receipt Scanner view -->
+                <!-- Receipt Scanner view -->
+                <div id="receipt-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-receipt"></i>
+                        <h2>Receipt Scanner</h2>
+                        <p>Upload and scan receipts to automatically add expenses</p>
+                        <button class="btn btn-primary" style="margin-top: 20px;" onclick="redirectToOBC()">Upload Receipt</button>
+                    </div>
+                </div>
+
+                <script>
+                    function redirectToOBC() {
+                        // Try to redirect to OBC.html
+                        window.location.href = 'OBT.html';
+                    }
+                    
+                    // Check if OBT.html exists when page loads
+                    window.addEventListener('load', function() {
+                        fetch('OBT.html', { method: 'HEAD' })
+                            .then(response => {
+                                if (!response.ok) {
+                                    console.warn('OBT.html not found at the expected location');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error checking for OBT.html:', error);
+                            });
+                    });
+                </script>
+                <div id="wallets-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-wallet"></i>
+                        <h2>Shared Wallets</h2>
+                        <p>Manage shared wallets with family or friends</p>
+                    </div>
+                </div>
+                
+                <div id="analytics-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-chart-bar"></i>
+                        <h2>Analytics</h2>
+                        <p>View detailed analytics of your spending patterns</p>
+                    </div>
+                </div>
+                
+                <div id="notifications-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-bell"></i>
+                        <h2>Notifications</h2>
+                        <p>Manage your notification preferences</p>
+                    </div>
+                </div>
+                
+                <div id="salary-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-money-check"></i>
+                        <h2>Salary Management</h2>
+                        <p>Track and manage your income sources</p>
+                    </div>
+                </div>
+                
+                <div id="expenses-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-receipt"></i>
+                        <h2>All Expenses</h2>
+                        <p>View and manage all your expenses</p>
+                    </div>
+                </div>
+                
+                <div id="budgets-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-chart-pie"></i>
+                        <h2>Budget Management</h2>
+                        <p>Set and track your spending budgets</p>
+                    </div>
+                </div>
+                
+                <div id="reports-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-file-alt"></i>
+                        <h2>Reports</h2>
+                        <p>Generate detailed financial reports</p>
+                    </div>
+                </div>
+                
+                <div id="settings-view" class="view-container">
+                    <div class="placeholder-view">
+                        <i class="fas fa-cog"></i>
+                        <h2>Settings</h2>
+                        <p>Configure your application preferences</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Operation successful</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample data for demonstration
+            const sampleExpenses = [
+                { id: 2, amount: 32.00, category: 'transport', description: 'Gasoline', date: '2023-06-14' },
+                { id: 3, amount: 89.99, category: 'shopping', description: 'New headphones', date: '2023-06-12' },
+            ];
+            
+            let expenses = [...sampleExpenses];
+            let authToken = localStorage.getItem('authToken') || 'demo-token';
+            let currentUser = { name: '', email: 'john.doe@example.com' };
+
+            // Show the main container
+            document.getElementById('mainContainer').style.display = 'block';
+
+            // Load user data
+            loadUserData();
+            
+            // Load expenses
+            loadExpenses();
+
+            // Event listeners
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('addExpenseBtn').addEventListener('click', showExpenseForm);
+            document.getElementById('cancelExpenseBtn').addEventListener('click', hideExpenseForm);
+            document.getElementById('createExpenseForm').addEventListener('submit', createExpense);
+
+            // Navigation
+            document.querySelectorAll('[data-view]').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const view = this.getAttribute('data-view');
+                    showView(view);
+                });
+            });
+
+            // Load user data
+            function loadUserData() {
+                updateUIWithUserData(currentUser);
+            }
+
+            // Load expenses
+            function loadExpenses() {
+                renderExpenses(expenses);
+                updateDashboardStats(expenses);
+            }
+
+            // Create a new expense
+            function createExpense(e) {
+                e.preventDefault();
+                
+                const amount = parseFloat(document.getElementById('expenseAmount').value);
+                const category = document.getElementById('expenseCategory').value;
+                const description = document.getElementById('expenseDescription').value;
+                const date = document.getElementById('expenseDate').value;
+                
+                const newExpense = {
+                    id: expenses.length + 1,
+                    amount: amount,
+                    category: category,
+                    description: description,
+                    date: date || new Date().toISOString().split('T')[0]
+                };
+                
+                expenses.push(newExpense);
+                renderExpenses(expenses);
+                updateDashboardStats(expenses);
+                hideExpenseForm();
+                document.getElementById('createExpenseForm').reset();
+                showToast('Expense added successfully', 'success');
+            }
+
+            // Delete an expense
+            function deleteExpense(expenseId) {
+                if (!confirm('Are you sure you want to delete this expense?')) {
+                    return;
+                }
+                
+                expenses = expenses.filter(expense => expense.id !== expenseId);
+                renderExpenses(expenses);
+                updateDashboardStats(expenses);
+                showToast('Expense deleted successfully', 'success');
+            }
+
+            // Update UI with user data
+            function updateUIWithUserData(user) {
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('welcomeText').textContent = `Welcome back, ${user.name.split(' ')[0]}!`;
+                
+                // Set user avatar initials
+                const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('userAvatar').textContent = initials;
+            }
+
+            // Render expenses list
+            function renderExpenses(expenses) {
+                const container = document.getElementById('expensesContainer');
+                
+                if (expenses.length === 0) {
+                    container.innerHTML = '<p>No expenses found. Add your first expense!</p>';
+                    return;
+                }
+                
+                container.innerHTML = expenses.map(expense => `
+                    <div class="expense-item">
+                        <div class="expense-details">
+                            <div><span class="category-badge category-${expense.category}">${getCategoryDisplayName(expense.category)}</span> <strong>${expense.description || 'No description'}</strong></div>
+                            <small>${new Date(expense.date).toLocaleDateString()}</small>
+                        </div>
+                        <div class="expense-amount">$${expense.amount.toFixed(2)}</div>
+                        <div class="expense-actions">
+                            <button class="btn btn-sm btn-warning" onclick="editExpense(${expense.id})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteExpense(${expense.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Get display name for category
+            function getCategoryDisplayName(category) {
+                const categoryMap = {
+                    'food': 'Food',
+                    'transport': 'Transport',
+                    'shopping': 'Shopping',
+                    'utilities': 'Utilities',
+                    'entertainment': 'Entertainment',
+                    'health': 'Health',
+                    'travel': 'Travel',
+                    'other': 'Other'
+                };
+                
+                return categoryMap[category] || category;
+            }
+
+            // Update dashboard statistics
+            function updateDashboardStats(expenses) {
+                const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+                const monthlyExpenses = expenses
+                    .filter(expense => {
+                        const expenseDate = new Date(expense.date);
+                        const currentDate = new Date();
+                        return expenseDate.getMonth() === currentDate.getMonth() && 
+                               expenseDate.getFullYear() === currentDate.getFullYear();
+                    })
+                    .reduce((sum, expense) => sum + expense.amount, 0);
+                
+                document.getElementById('monthlyExpenses').textContent = `$${monthlyExpenses.toFixed(2)}`;
+                document.getElementById('totalBalance').textContent = `$${(5200 - monthlyExpenses).toFixed(2)}`;
+            }
+
+            // Show expense form
+            function showExpenseForm() {
+                document.getElementById('expenseForm').style.display = 'block';
+                document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            }
+
+            // Hide expense form
+            function hideExpenseForm() {
+                document.getElementById('expenseForm').style.display = 'none';
+            }
+
+            // Show specific view
+            function showView(viewName) {
+                document.querySelectorAll('.view-container').forEach(view => {
+                    view.classList.remove('active');
+                });
+                document.querySelectorAll('.nav-links a, .sidebar-menu a').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                document.getElementById(`${viewName}-view`).classList.add('active');
+                document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
+            }
+
+            // Logout function
+            function logout() {
+                localStorage.removeItem('authToken');
+                // In a real app, this would redirect to login page
+                showToast('Logged out successfully', 'success');
+            }
+
+            // Show toast notification
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const toastMessage = document.getElementById('toastMessage');
+                const toastIcon = toast.querySelector('i');
+                
+                toastMessage.textContent = message;
+                
+                // Set toast style based on type
+                toast.className = 'toast';
+                toast.classList.add(type);
+                
+                // Update icon based on type
+                if (type === 'success') {
+                    toastIcon.className = 'fas fa-check-circle';
+                } else {
+                    toastIcon.className = 'fas fa-exclamation-circle';
+                }
+                
+                // Show toast
+                toast.classList.add('show');
+                
+                // Hide toast after 3 seconds (fixed from 600 seconds)
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            // Make functions available globally for onclick handlers
+            window.deleteExpense = deleteExpense;
+            window.editExpense = function(expenseId) {
+                // Implementation for editing expenses
+                showToast('Edit functionality coming soon', 'success');
+            };
+        });
+    </script>
+</body>
+</html>
